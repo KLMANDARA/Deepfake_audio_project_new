@@ -34,54 +34,23 @@
 <canvas id="canvas" width="500" height="200"></canvas>
 
 <p id="result"></p>
-
 <script>
-const audioInput = document.getElementById("audio");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+function analyze() {
+    let score = Math.random(); // simulate AI confidence
+    let confidence = (score * 100).toFixed(2);
 
-audioInput.addEventListener("change", function() {
-    const file = this.files[0];
-    if (!file) return;
+    let resultElement = document.getElementById("result");
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-        audioCtx.decodeAudioData(e.target.result, function(buffer) {
-            const data = buffer.getChannelData(0);
-            drawWaveform(data);
-        });
-    };
-
-    reader.readAsArrayBuffer(file);
-});
-
-function drawWaveform(data) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const step = Math.ceil(data.length / canvas.width);
-    const amp = canvas.height / 2;
-
-    for (let i = 0; i < canvas.width; i++) {
-        let min = 1.0;
-        let max = -1.0;
-
-        for (let j = 0; j < step; j++) {
-            const datum = data[(i * step) + j];
-            if (datum < min) min = datum;
-            if (datum > max) max = datum;
-        }
-
-        ctx.fillStyle = "lime";
-        ctx.fillRect(i, (1 + min) * amp, 1, Math.max(1, (max - min) * amp));
+    if (score > 0.6) {
+        resultElement.innerText = `⚠️ Fake Audio (${confidence}% confidence)`;
+        resultElement.style.color = "red";   // 🔴 FAKE = RED
+    } else {
+        resultElement.innerText = `✅ Real Audio (${confidence}% confidence)`;
+        resultElement.style.color = "lime";  // 🟢 REAL = GREEN
     }
 }
+</script>
 
-function analyze() {
-    document.getElementById("result").innerText =
-        Math.random() > 0.5 ? "⚠️ Fake Audio Detected" : "✅ Real Audio";
-}
-        </script>
 
 </body>
 </html>
