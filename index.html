@@ -1,56 +1,143 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Deepfake Audio Detection</title>
-    <style>
-        body {
-            background: #0f172a;
-            color: white;
-            text-align: center;
-            font-family: Arial;
-        }
-        button {
-            padding: 10px;
-            margin-top: 10px;
-            background: green;
-            border: none;
-            color: white;
-        }
-        canvas {
-            margin-top: 20px;
-            background: black;
-        }
-    </style>
+
+```
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #1a1a1a;
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+    }
+
+    input {
+        margin: 10px;
+    }
+
+    button {
+        padding: 10px 20px;
+        background: green;
+        border: none;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background: #00cc66;
+    }
+
+    canvas {
+        margin-top: 20px;
+        background: #111;
+        border-radius: 8px;
+    }
+
+    .result-box {
+        padding: 15px;
+        margin-top: 20px;
+        font-weight: bold;
+        border-radius: 8px;
+    }
+
+    .real {
+        background-color: #003300;
+        color: #00ff00;
+    }
+
+    .fake {
+        background-color: #330000;
+        color: #ff4d4d;
+    }
+</style>
+```
+
 </head>
 
 <body>
 
+```
 <h1>🎧 Deepfake Audio Detection</h1>
 
-<input type="file" id="audio" accept="audio/*">
+<input type="file" id="audioInput" accept="audio/*">
 <br>
-<button onclick="analyze()">Analyze</button>
+<button onclick="analyzeAudio()">Analyze</button>
 
-<canvas id="canvas" width="500" height="200"></canvas>
+<canvas id="waveform" width="600" height="200"></canvas>
 
-<p id="result"></p>
+<div id="resultBox" class="result-box"></div>
+
 <script>
-function analyze() {
-    let score = Math.random(); // simulate AI confidence
-    let confidence = (score * 100).toFixed(2);
+    let audioBuffer = null;
 
-    let resultElement = document.getElementById("result");
+    // Load audio + draw waveform
+    document.getElementById("audioInput").addEventListener("change", function () {
+        const file = this.files[0];
+        const reader = new FileReader();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    if (score > 0.6) {
-        resultElement.innerText = `⚠️ Fake Audio (${confidence}% confidence)`;
-        resultElement.style.color = "red";   // 🔴 FAKE = RED
-    } else {
-        resultElement.innerText = `✅ Real Audio (${confidence}% confidence)`;
-        resultElement.style.color = "lime";  // 🟢 REAL = GREEN
+        reader.onload = function (e) {
+            audioCtx.decodeAudioData(e.target.result, function (buffer) {
+                audioBuffer = buffer;
+                drawWaveform(buffer);
+            });
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+
+    // Draw waveform
+    function drawWaveform(buffer) {
+        const canvas = document.getElementById("waveform");
+        const ctx = canvas.getContext("2d");
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+
+        const data = buffer.getChannelData(0);
+        const step = Math.ceil(data.length / canvas.width);
+
+        for (let i = 0; i < canvas.width; i++) {
+            const y = (1 + data[i * step]) * canvas.height / 2;
+            ctx.lineTo(i, y);
+        }
+
+        ctx.strokeStyle = "#00ffcc";
+        ctx.stroke();
     }
-}
-</script>
 
+    // Analyze audio (dummy logic for demo)
+    function analyzeAudio() {
+        const box = document.getElementById("resultBox");
+
+        if (!audioBuffer) {
+            alert("Please upload an audio file first!");
+            return;
+        }
+
+        // Fake detection logic (for demo)
+        const confidence = (Math.random() * 50 + 50).toFixed(2);
+        const isFake = Math.random() > 0.5;
+
+        if (isFake) {
+            box.className = "result-box fake";
+            box.innerHTML = "❌ Fake Audio (" + confidence + "% confidence)";
+        } else {
+            box.className = "result-box real";
+            box.innerHTML = "✅ Real Audio (" + confidence + "% confidence)";
+        }
+    }
+</script>
+```
 
 </body>
 </html>
