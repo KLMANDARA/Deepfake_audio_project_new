@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deepfake Audio Detection</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            font-family: Arial;
+        }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            background: green;
+            border: none;
+            color: white;
+        }
+        canvas {
+            margin-top: 20px;
+            background: black;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🎧 Deepfake Audio Detection</h1>
+
+<input type="file" id="audio" accept="audio/*">
+<br>
+<button onclick="analyze()">Analyze</button>
+
+<canvas id="canvas" width="500" height="200"></canvas>
+
+<p id="result"></p>
+
+<script>
+function analyze() {
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext("2d");
+
+    for (let i = 0; i < 500; i++) {
+        let height = Math.random() * 200;
+        ctx.fillStyle = "lime";
+        ctx.fillRect(i, 200 - height, 1, height);
+    }
+
+    document.getElementById("result").innerText =
+        Math.random() > 0.5 ? "⚠️ Fake Audio" : "✅ Real Audio";
+}
+</script>
+
+</body>
+</html>
